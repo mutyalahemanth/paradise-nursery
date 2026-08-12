@@ -26,8 +26,41 @@ const CartItem = ({ item, onRemove, onUpdateQuantity }) => {
   );
 };
 
-// Helper function to calculate total cart amount
 export const calculateTotalAmount = (items) =>
   items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 export default CartItem;
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import CartItem, { calculateTotalAmount } from "./CartItem";
+import { removeItem, updateQuantity } from "../features/cart/CartSlice";
+
+const CartPage = () => {
+  const cartItems = useSelector((state) => state.cart.items);
+  const dispatch = useDispatch();
+
+  return (
+    <div className="cart-page">
+      <h2>Your Shopping Cart</h2>
+      {cartItems.length === 0 ? (
+        <p>No items in cart</p>
+      ) : (
+        <>
+          {cartItems.map((item) => (
+            <CartItem
+              key={item.id}
+              item={item}
+              onRemove={(id) => dispatch(removeItem(id))}
+              onUpdateQuantity={(id, qty) =>
+                dispatch(updateQuantity({ id, quantity: qty }))
+              }
+            />
+          ))}
+          <h3>Cart Total: ₹{calculateTotalAmount(cartItems)}</h3>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CartPage;
